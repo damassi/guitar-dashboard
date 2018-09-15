@@ -856,6 +856,41 @@ var chordInterval;
     }
     chordInterval.update = update;
 })(chordInterval || (chordInterval = {}));
+var chordDiagram;
+(function (chordDiagram) {
+    let jtab = window.jtab;
+    let $ = window.$;
+    function init() {
+        events.scaleChange.subscribe(updateChordDiagrams);
+    }
+    chordDiagram.init = init;
+    function updateChordDiagrams(scaleChanged) {
+        // let sortOrder = ['1', '5', 'M2', 'M6', 'M3', 'M7', 'A4'] //, 'm2', 'm6', 'm3', 'm7', '4']
+        let sortOrder = ['1', 'M2', 'M3', '4', '5', 'M6', 'M7'];
+        console.log(scaleChanged);
+        let orderedNodes = sortOrder.map(intervalName => {
+            return scaleChanged.nodes.find(node => node.intervalName === intervalName);
+        });
+        let notes = orderedNodes.map((node, index) => {
+            let isMinor = sortOrder[index].substr(0, 1) === 'M' && sortOrder[index] !== 'M7';
+            let isAugmented = sortOrder[index].substr(0, 1) === 'A';
+            let isDim = sortOrder[index] === 'M7';
+            let note = node.scaleNote.note.label.replace('♭', 'b').replace('♯', '#');
+            if (isMinor) {
+                note += 'm';
+            }
+            if (isAugmented) {
+                note += 'aug';
+            }
+            if (isDim) {
+                note += 'dim';
+            }
+            return note;
+        });
+        console.log(notes);
+        jtab.render($('#tab'), notes.join(' '));
+    }
+})(chordDiagram || (chordDiagram = {}));
 var modes;
 (function (modes_1) {
     let buttons;
@@ -1001,7 +1036,7 @@ var gtr;
         svg.append("text")
             .attr("class", "mode-text")
             .attr("x", 30)
-            .attr("y", 10)
+            .attr("y", 11)
             .text(tuningInfo.tuning + " "
             + tuningInfo.description
             + (isLeftHanded ? ", Left Handed" : "")
@@ -1273,6 +1308,7 @@ var midiControl;
 tonics.init();
 modes.init(music.scaleFamily[0]);
 chordInterval.init();
+chordDiagram.init();
 let chromatic = new cof.NoteCircle(d3.select("#chromatic"), music.chromatic(), "Chromatic");
 let circleOfFifths = new cof.NoteCircle(d3.select("#cof"), music.fifths(), "Circle of Fifths");
 gtr.init();

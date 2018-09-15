@@ -124,6 +124,7 @@ namespace cof {
         }
 
         update(scaleChnaged: events.ScaleChangedEvent): void {
+
             let data: Segment[] = scaleChnaged.nodes.map(node => <Segment>{
                     startAngle: 0,
                     endAngle: 0,
@@ -134,7 +135,7 @@ namespace cof {
 
             this.noteSegments
                 .data(data, this.indexer)
-                .attr("class", (d, i) => "note-segment " + 
+                .attr("class", (d, i) => "note-segment " +
                     (d.node.scaleNote.isScaleNote ? ((i === 0) ? "note-segment-tonic" : "note-segment-scale") : ""));
 
             this.noteText
